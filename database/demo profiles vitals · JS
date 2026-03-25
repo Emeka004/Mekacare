@@ -1,0 +1,165 @@
+'use strict';
+
+const PROVIDER1_ID = 'bbbbbbbb-0000-0000-0000-000000000001';
+const PROVIDER2_ID = 'bbbbbbbb-0000-0000-0000-000000000002';
+const PATIENT1_ID  = 'cccccccc-0000-0000-0000-000000000001';
+const PATIENT2_ID  = 'cccccccc-0000-0000-0000-000000000002';
+const PATIENT3_ID  = 'cccccccc-0000-0000-0000-000000000003';
+
+module.exports = {
+  async up(queryInterface) {
+    const now = new Date();
+
+    // ── Provider profiles ──────────────────────────────────────────────
+    await queryInterface.bulkInsert('provider_profiles', [
+      {
+        id: 'dddddddd-0000-0000-0000-000000000001',
+        userId: PROVIDER1_ID,
+        licenseNumber: 'MD-NGR-00123',
+        specialty: 'obstetrician',
+        yearsOfExperience: 12,
+        hospital: 'Lagos University Teaching Hospital',
+        clinicAddress: '1 Idi-Araba Road, Lagos, Nigeria',
+        bio: 'Board-certified obstetrician with 12 years specialising in high-risk pregnancies.',
+        education: JSON.stringify([{ degree: 'MBChB', institution: 'University of Lagos', year: 2010 }]),
+        certifications: JSON.stringify(['FWACS', 'FMCOG']),
+        languages: JSON.stringify(['English', 'Yoruba', 'Igbo']),
+        consultationFee: 15000.00,
+        acceptingPatients: true,
+        rating: 4.8,
+        reviewCount: 124,
+        availableSlots: JSON.stringify({ Monday: ['09:00','10:00','11:00'], Wednesday: ['14:00','15:00'], Friday: ['09:00','10:00'] }),
+        isVerified: true,
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: 'dddddddd-0000-0000-0000-000000000002',
+        userId: PROVIDER2_ID,
+        licenseNumber: 'MD-NGR-00456',
+        specialty: 'midwife',
+        yearsOfExperience: 8,
+        hospital: 'Ikeja General Hospital',
+        clinicAddress: '45 Obafemi Awolowo Way, Ikeja, Lagos',
+        bio: 'Experienced midwife supporting natural births and antenatal care across Lagos.',
+        education: JSON.stringify([{ degree: 'BNSc Midwifery', institution: 'University of Ibadan', year: 2015 }]),
+        certifications: JSON.stringify(['RMNCH', 'BNSC']),
+        languages: JSON.stringify(['English', 'Yoruba']),
+        consultationFee: 8000.00,
+        acceptingPatients: true,
+        rating: 4.6,
+        reviewCount: 87,
+        availableSlots: JSON.stringify({ Tuesday: ['08:00','09:00','10:00'], Thursday: ['13:00','14:00','15:00'] }),
+        isVerified: true,
+        createdAt: now, updatedAt: now,
+      },
+    ]);
+
+    // ── Pregnancy profiles ─────────────────────────────────────────────
+    await queryInterface.bulkInsert('pregnancy_profiles', [
+      {
+        id: 'eeeeeeee-0000-0000-0000-000000000001',
+        userId: PATIENT1_ID,
+        primaryProviderId: PROVIDER1_ID,
+        lastMenstrualPeriod: '2024-06-10',
+        estimatedDueDate: '2025-03-17',
+        gravidaPara: 'G1P0',
+        bloodType: 'O+',
+        prePregnancyWeight: 62.0,
+        currentWeight: 71.5,
+        height: 162.0,
+        isHighRisk: false,
+        riskFactors: JSON.stringify([]),
+        medicalHistory: JSON.stringify({ diabetes: false, hypertension: false }),
+        allergies: JSON.stringify(['Penicillin']),
+        medications: JSON.stringify([{ name: 'Folic Acid', dose: '5mg', frequency: 'daily' }]),
+        deliveryPlan: JSON.stringify({ preferredMethod: 'vaginal', hospitalChoice: 'LUTH' }),
+        status: 'active',
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: 'eeeeeeee-0000-0000-0000-000000000002',
+        userId: PATIENT2_ID,
+        primaryProviderId: PROVIDER1_ID,
+        lastMenstrualPeriod: '2024-04-01',
+        estimatedDueDate: '2025-01-06',
+        gravidaPara: 'G3P2',
+        bloodType: 'A+',
+        prePregnancyWeight: 70.0,
+        currentWeight: 83.0,
+        height: 165.0,
+        isHighRisk: true,
+        riskFactors: JSON.stringify(['gestational_diabetes', 'advanced_maternal_age']),
+        medicalHistory: JSON.stringify({ diabetes: true, hypertension: false }),
+        allergies: JSON.stringify([]),
+        medications: JSON.stringify([
+          { name: 'Metformin', dose: '500mg', frequency: 'twice daily' },
+          { name: 'Folic Acid', dose: '5mg', frequency: 'daily' },
+        ]),
+        deliveryPlan: JSON.stringify({ preferredMethod: 'caesarean', hospitalChoice: 'Ikeja General' }),
+        status: 'active',
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: 'eeeeeeee-0000-0000-0000-000000000003',
+        userId: PATIENT3_ID,
+        primaryProviderId: PROVIDER2_ID,
+        lastMenstrualPeriod: '2024-08-20',
+        estimatedDueDate: '2025-05-27',
+        gravidaPara: 'G1P0',
+        bloodType: 'B-',
+        prePregnancyWeight: 55.0,
+        currentWeight: 60.0,
+        height: 158.0,
+        isHighRisk: false,
+        riskFactors: JSON.stringify([]),
+        medicalHistory: JSON.stringify({ diabetes: false, hypertension: false }),
+        allergies: JSON.stringify([]),
+        medications: JSON.stringify([{ name: 'Iron Supplement', dose: '200mg', frequency: 'daily' }]),
+        deliveryPlan: JSON.stringify({ preferredMethod: 'vaginal' }),
+        status: 'active',
+        createdAt: now, updatedAt: now,
+      },
+    ]);
+
+    // ── Vital signs ────────────────────────────────────────────────────
+    const vitals = [];
+    const twoWeeksAgo = new Date(now.getTime() - 14 * 86400000);
+    const oneWeekAgo  = new Date(now.getTime() -  7 * 86400000);
+
+    const vitalRows = [
+      // Patient 1 – two readings
+      { patientId: PATIENT1_ID, recordedBy: PROVIDER1_ID, recordedAt: twoWeeksAgo,
+        weight: 70.0, bloodPressureSystolic: 118, bloodPressureDiastolic: 76,
+        heartRate: 82, fetalHeartRate: 148, oxygenSaturation: 98.5,
+        temperature: 36.8, gestationalWeekAtReading: 26, isAbnormal: false, abnormalFlags: JSON.stringify([]) },
+      { patientId: PATIENT1_ID, recordedBy: PROVIDER1_ID, recordedAt: oneWeekAgo,
+        weight: 71.5, bloodPressureSystolic: 120, bloodPressureDiastolic: 78,
+        heartRate: 84, fetalHeartRate: 151, oxygenSaturation: 98.0,
+        temperature: 36.9, gestationalWeekAtReading: 27, isAbnormal: false, abnormalFlags: JSON.stringify([]) },
+      // Patient 2 – high-risk reading
+      { patientId: PATIENT2_ID, recordedBy: PROVIDER1_ID, recordedAt: oneWeekAgo,
+        weight: 83.0, bloodPressureSystolic: 145, bloodPressureDiastolic: 92,
+        heartRate: 90, fetalHeartRate: 142, bloodGlucose: 11.2, oxygenSaturation: 97.0,
+        temperature: 37.1, gestationalWeekAtReading: 38,
+        isAbnormal: true, abnormalFlags: JSON.stringify(['blood_pressure','blood_glucose']) },
+      // Patient 3 – first reading
+      { patientId: PATIENT3_ID, recordedBy: PROVIDER2_ID, recordedAt: now,
+        weight: 60.0, bloodPressureSystolic: 110, bloodPressureDiastolic: 70,
+        heartRate: 78, fetalHeartRate: 155, oxygenSaturation: 99.0,
+        temperature: 36.7, gestationalWeekAtReading: 18, isAbnormal: false, abnormalFlags: JSON.stringify([]) },
+    ];
+
+    const { v4: uuidv4 } = require('uuid');
+    for (const v of vitalRows) {
+      vitals.push({ id: uuidv4(), ...v, notes: null, createdAt: v.recordedAt, updatedAt: v.recordedAt });
+    }
+
+    await queryInterface.bulkInsert('vital_signs', vitals);
+  },
+
+  async down(queryInterface) {
+    await queryInterface.bulkDelete('vital_signs', null, {});
+    await queryInterface.bulkDelete('pregnancy_profiles', null, {});
+    await queryInterface.bulkDelete('provider_profiles', null, {});
+  },
+};
