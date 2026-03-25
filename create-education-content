@@ -1,0 +1,40 @@
+'use strict';
+
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable('education_contents', {
+      id:              { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV4, primaryKey: true },
+      authorId:        { type: Sequelize.UUID,
+                         references: { model: 'users', key: 'id' }, onDelete: 'SET NULL' },
+      title:           { type: Sequelize.STRING(300), allowNull: false },
+      slug:            { type: Sequelize.STRING(300), unique: true },
+      summary:         { type: Sequelize.TEXT },
+      content:         { type: Sequelize.TEXT, allowNull: false },
+      category:        { type: Sequelize.ENUM('nutrition','exercise','mental_health','labor_delivery','postpartum','fetal_development','medication_safety','warning_signs','general'), allowNull: false },
+      type:            { type: Sequelize.ENUM('article','video','infographic','checklist','faq'), defaultValue: 'article' },
+      trimesterTarget: { type: Sequelize.ARRAY(Sequelize.INTEGER), defaultValue: [1,2,3] },
+      tags:            { type: Sequelize.ARRAY(Sequelize.TEXT), defaultValue: [] },
+      coverImage:      { type: Sequelize.STRING },
+      videoUrl:        { type: Sequelize.STRING },
+      readTimeMinutes: { type: Sequelize.INTEGER },
+      isPublished:     { type: Sequelize.BOOLEAN, defaultValue: false },
+      publishedAt:     { type: Sequelize.DATE },
+      viewCount:       { type: Sequelize.INTEGER, defaultValue: 0 },
+      likeCount:       { type: Sequelize.INTEGER, defaultValue: 0 },
+      isFeatured:      { type: Sequelize.BOOLEAN, defaultValue: false },
+      createdAt:       { type: Sequelize.DATE, allowNull: false },
+      updatedAt:       { type: Sequelize.DATE, allowNull: false },
+    });
+
+    await queryInterface.addIndex('education_contents', ['slug']);
+    await queryInterface.addIndex('education_contents', ['category']);
+    await queryInterface.addIndex('education_contents', ['isPublished']);
+    await queryInterface.addIndex('education_contents', ['isFeatured']);
+  },
+
+  async down(queryInterface) {
+    await queryInterface.dropTable('education_contents');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_education_contents_category";');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_education_contents_type";');
+  },
+};
