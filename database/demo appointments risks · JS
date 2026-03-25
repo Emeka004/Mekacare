@@ -1,0 +1,111 @@
+'use strict';
+
+const { v4: uuidv4 } = require('uuid');
+
+const PROVIDER1_ID = 'bbbbbbbb-0000-0000-0000-000000000001';
+const PROVIDER2_ID = 'bbbbbbbb-0000-0000-0000-000000000002';
+const PATIENT1_ID  = 'cccccccc-0000-0000-0000-000000000001';
+const PATIENT2_ID  = 'cccccccc-0000-0000-0000-000000000002';
+const PATIENT3_ID  = 'cccccccc-0000-0000-0000-000000000003';
+
+const future = (days) => new Date(Date.now() + days * 86400000);
+const past   = (days) => new Date(Date.now() - days * 86400000);
+
+module.exports = {
+  async up(queryInterface) {
+    const now = new Date();
+
+    // ── Appointments ───────────────────────────────────────────────────
+    await queryInterface.bulkInsert('appointments', [
+      {
+        id: uuidv4(), patientId: PATIENT1_ID, providerId: PROVIDER1_ID,
+        scheduledAt: future(3), duration: 30, type: 'prenatal_checkup',
+        status: 'confirmed', location: 'LUTH, Block B, Room 12',
+        reason: 'Routine 28-week check-up', isVirtual: false,
+        reminderSent: false, prescription: JSON.stringify([]),
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: uuidv4(), patientId: PATIENT1_ID, providerId: PROVIDER1_ID,
+        scheduledAt: past(14), duration: 45, type: 'ultrasound',
+        status: 'completed', location: 'LUTH Radiology',
+        reason: 'Anatomy scan', diagnosis: 'Normal foetal anatomy. Placenta anterior.',
+        notes: 'Baby in cephalic presentation. Growth on track.',
+        isVirtual: false, reminderSent: true, prescription: JSON.stringify([]),
+        createdAt: past(20), updatedAt: past(14),
+      },
+      {
+        id: uuidv4(), patientId: PATIENT2_ID, providerId: PROVIDER1_ID,
+        scheduledAt: future(1), duration: 30, type: 'consultation',
+        status: 'scheduled', reason: 'Review blood glucose levels and BP management',
+        isVirtual: false, reminderSent: false, prescription: JSON.stringify([]),
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: uuidv4(), patientId: PATIENT2_ID, providerId: PROVIDER1_ID,
+        scheduledAt: past(7), duration: 30, type: 'blood_test',
+        status: 'completed', location: 'LUTH Lab',
+        diagnosis: 'HbA1c elevated at 7.2%. Adjust Metformin dosage.',
+        isVirtual: false, reminderSent: true, prescription: JSON.stringify([
+          { drug: 'Metformin', dose: '1000mg', frequency: 'twice daily', duration: '4 weeks' },
+        ]),
+        createdAt: past(10), updatedAt: past(7),
+      },
+      {
+        id: uuidv4(), patientId: PATIENT3_ID, providerId: PROVIDER2_ID,
+        scheduledAt: future(7), duration: 30, type: 'prenatal_checkup',
+        status: 'scheduled', reason: '18-week antenatal visit',
+        isVirtual: false, reminderSent: false, prescription: JSON.stringify([]),
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: uuidv4(), patientId: PATIENT3_ID, providerId: PROVIDER2_ID,
+        scheduledAt: future(14), duration: 60, type: 'virtual',
+        status: 'confirmed', reason: 'Follow-up on iron levels',
+        isVirtual: true, meetingLink: 'https://meet.pregnancyhealth.com/aisha-ngozi-001',
+        reminderSent: false, prescription: JSON.stringify([]),
+        createdAt: now, updatedAt: now,
+      },
+    ]);
+
+    // ── Risk reports ───────────────────────────────────────────────────
+    await queryInterface.bulkInsert('risk_reports', [
+      {
+        id: uuidv4(),
+        patientId: PATIENT2_ID,
+        reportedBy: PATIENT2_ID,
+        reviewedBy: PROVIDER1_ID,
+        category: 'hypertension',
+        severity: 'high',
+        status: 'under_review',
+        title: 'Persistent headache and visual disturbances',
+        description: 'Experiencing severe headache for the past 6 hours with blurred vision. BP self-measured at 150/95 at home.',
+        symptoms: JSON.stringify(['headache', 'blurred_vision', 'high_blood_pressure']),
+        vitalsAtReport: JSON.stringify({ bloodPressureSystolic: 150, bloodPressureDiastolic: 95, heartRate: 95 }),
+        actionTaken: 'Provider contacted. Patient advised to go to ER immediately.',
+        requiresEmergency: true,
+        createdAt: past(2), updatedAt: past(1),
+      },
+      {
+        id: uuidv4(),
+        patientId: PATIENT1_ID,
+        reportedBy: PATIENT1_ID,
+        reviewedBy: null,
+        category: 'fetal_movement',
+        severity: 'moderate',
+        status: 'open',
+        title: 'Reduced fetal movement',
+        description: 'Baby has been moving less than usual for the past 12 hours. Normally very active at this time of day.',
+        symptoms: JSON.stringify(['reduced_fetal_movement']),
+        vitalsAtReport: JSON.stringify({ fetalHeartRate: null }),
+        requiresEmergency: false,
+        createdAt: now, updatedAt: now,
+      },
+    ]);
+  },
+
+  async down(queryInterface) {
+    await queryInterface.bulkDelete('risk_reports', null, {});
+    await queryInterface.bulkDelete('appointments', null, {});
+  },
+};
