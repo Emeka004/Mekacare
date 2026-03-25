@@ -1,0 +1,37 @@
+'use strict';
+
+module.exports = {
+  async up(queryInterface, Sequelize) {
+    await queryInterface.createTable('provider_profiles', {
+      id:                { type: Sequelize.UUID, defaultValue: Sequelize.UUIDV4, primaryKey: true },
+      userId:            { type: Sequelize.UUID, allowNull: false, unique: true,
+                           references: { model: 'users', key: 'id' }, onDelete: 'CASCADE' },
+      licenseNumber:     { type: Sequelize.STRING(50), allowNull: false },
+      specialty:         { type: Sequelize.ENUM('obstetrician','gynecologist','midwife','perinatologist','nurse_practitioner','general_practitioner'), allowNull: false },
+      yearsOfExperience: { type: Sequelize.INTEGER },
+      hospital:          { type: Sequelize.STRING(200) },
+      clinicAddress:     { type: Sequelize.TEXT },
+      bio:               { type: Sequelize.TEXT },
+      education:         { type: Sequelize.JSONB, defaultValue: [] },
+      certifications:    { type: Sequelize.ARRAY(Sequelize.TEXT), defaultValue: [] },
+      languages:         { type: Sequelize.ARRAY(Sequelize.TEXT), defaultValue: ['English'] },
+      consultationFee:   { type: Sequelize.DECIMAL(10, 2) },
+      acceptingPatients: { type: Sequelize.BOOLEAN, defaultValue: true },
+      rating:            { type: Sequelize.FLOAT, defaultValue: 0 },
+      reviewCount:       { type: Sequelize.INTEGER, defaultValue: 0 },
+      availableSlots:    { type: Sequelize.JSONB, defaultValue: {} },
+      isVerified:        { type: Sequelize.BOOLEAN, defaultValue: false },
+      createdAt:         { type: Sequelize.DATE, allowNull: false },
+      updatedAt:         { type: Sequelize.DATE, allowNull: false },
+    });
+
+    await queryInterface.addIndex('provider_profiles', ['specialty']);
+    await queryInterface.addIndex('provider_profiles', ['isVerified']);
+    await queryInterface.addIndex('provider_profiles', ['acceptingPatients']);
+  },
+
+  async down(queryInterface) {
+    await queryInterface.dropTable('provider_profiles');
+    await queryInterface.sequelize.query('DROP TYPE IF EXISTS "enum_provider_profiles_specialty";');
+  },
+};
