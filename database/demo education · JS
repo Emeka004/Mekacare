@@ -1,0 +1,97 @@
+'use strict';
+
+const { v4: uuidv4 } = require('uuid');
+
+const ADMIN_ID     = 'aaaaaaaa-0000-0000-0000-000000000001';
+const PROVIDER1_ID = 'bbbbbbbb-0000-0000-0000-000000000001';
+
+module.exports = {
+  async up(queryInterface) {
+    const now = new Date();
+
+    await queryInterface.bulkInsert('education_contents', [
+      {
+        id: uuidv4(), authorId: ADMIN_ID,
+        title: 'Nutrition in the First Trimester: What to Eat and Avoid',
+        slug: 'nutrition-first-trimester',
+        summary: 'A complete guide to eating well during the first 13 weeks of pregnancy.',
+        content: `Good nutrition in the first trimester is critical for your baby's neural tube development. Focus on folate-rich foods like leafy greens, lentils, and fortified cereals. Take a daily prenatal vitamin with at least 400mcg of folic acid.\n\nFoods to avoid: raw fish, unpasteurised cheese, deli meats, high-mercury fish (shark, swordfish, king mackerel), and alcohol.\n\nStay hydrated — aim for 8–10 glasses of water daily. If morning sickness is severe, eat small frequent meals and consider ginger tea.`,
+        category: 'nutrition', type: 'article',
+        trimesterTarget: JSON.stringify([1]),
+        tags: JSON.stringify(['nutrition', 'first trimester', 'folic acid', 'morning sickness']),
+        readTimeMinutes: 6, isPublished: true, publishedAt: now,
+        viewCount: 312, likeCount: 48, isFeatured: true,
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: uuidv4(), authorId: PROVIDER1_ID,
+        title: 'Warning Signs You Should Never Ignore During Pregnancy',
+        slug: 'pregnancy-warning-signs',
+        summary: 'Know the red flags that require immediate medical attention.',
+        content: `Seek emergency care immediately if you experience any of the following:\n\n1. **Heavy vaginal bleeding** – can indicate placenta previa or abruption.\n2. **Severe abdominal pain** – may signal ectopic pregnancy or placental abruption.\n3. **Sudden severe headache with visual changes** – a hallmark of preeclampsia.\n4. **Decreased or absent fetal movement** – after 28 weeks, count kicks; fewer than 10 in 2 hours warrants a call to your provider.\n5. **Signs of preterm labour** – regular contractions before 37 weeks, low back pain, pelvic pressure.\n6. **High fever (>38°C)** – can indicate infection that may harm the baby.\n7. **Severe vomiting** – hyperemesis gravidarum can cause dangerous dehydration.\n\nWhen in doubt, always call your provider or go to the emergency room.`,
+        category: 'warning_signs', type: 'article',
+        trimesterTarget: JSON.stringify([1, 2, 3]),
+        tags: JSON.stringify(['emergency', 'warning signs', 'preeclampsia', 'fetal movement']),
+        readTimeMinutes: 5, isPublished: true, publishedAt: now,
+        viewCount: 541, likeCount: 87, isFeatured: true,
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: uuidv4(), authorId: PROVIDER1_ID,
+        title: 'Safe Exercises During the Second Trimester',
+        slug: 'safe-exercises-second-trimester',
+        summary: 'Stay active safely with these provider-approved exercises for weeks 14–26.',
+        content: `Exercise during pregnancy is beneficial for both mother and baby. Aim for 150 minutes of moderate-intensity activity per week.\n\n**Recommended exercises:**\n- Walking: low-impact, easy to maintain throughout pregnancy\n- Swimming: relieves joint pressure and is excellent cardio\n- Prenatal yoga: improves flexibility and reduces stress\n- Stationary cycling: safe and non-weight-bearing\n- Pelvic floor (Kegel) exercises: prepare the body for labour\n\n**Exercises to avoid:**\n- Contact sports\n- Lying flat on your back after 16 weeks\n- Hot yoga or exercising in excessive heat\n- High-altitude exercise if not acclimatised\n- Activities with high fall risk\n\nAlways listen to your body. Stop if you feel chest pain, dizziness, or abnormal shortness of breath.`,
+        category: 'exercise', type: 'article',
+        trimesterTarget: JSON.stringify([2]),
+        tags: JSON.stringify(['exercise', 'second trimester', 'yoga', 'fitness']),
+        readTimeMinutes: 7, isPublished: true, publishedAt: now,
+        viewCount: 198, likeCount: 34, isFeatured: false,
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: uuidv4(), authorId: ADMIN_ID,
+        title: 'Understanding Gestational Diabetes: Causes, Risks and Management',
+        slug: 'gestational-diabetes-guide',
+        summary: 'Everything you need to know about GDM — diagnosis, diet, medication and monitoring.',
+        content: `Gestational diabetes mellitus (GDM) affects approximately 1 in 10 pregnancies. It occurs when the body cannot produce enough insulin to meet the increased demands of pregnancy.\n\n**Risk factors:** BMI >30, family history of diabetes, previous GDM, polycystic ovary syndrome, age >35.\n\n**Diagnosis:** An oral glucose tolerance test (OGTT) is performed between 24–28 weeks.\n\n**Management:**\n1. **Diet:** Limit refined carbohydrates, eat regular small meals, pair carbs with protein and fat.\n2. **Exercise:** 30 minutes of walking after each meal helps regulate blood sugar.\n3. **Monitoring:** Check blood glucose 4x daily — fasting and 1-2 hours after each meal.\n4. **Medication:** If diet and exercise are insufficient, Metformin or insulin may be prescribed.\n\n**Risks if uncontrolled:** Large baby (macrosomia), premature birth, neonatal hypoglycaemia, increased C-section risk, and long-term risk of Type 2 diabetes for mother.`,
+        category: 'general', type: 'article',
+        trimesterTarget: JSON.stringify([2, 3]),
+        tags: JSON.stringify(['gestational diabetes', 'GDM', 'blood sugar', 'insulin']),
+        readTimeMinutes: 9, isPublished: true, publishedAt: now,
+        viewCount: 423, likeCount: 61, isFeatured: false,
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: uuidv4(), authorId: ADMIN_ID,
+        title: 'Your Third Trimester: What to Expect in Weeks 27–40',
+        slug: 'third-trimester-guide',
+        summary: 'A week-by-week guide to the final stretch of pregnancy.',
+        content: `The third trimester is the home stretch! Your baby grows rapidly from about 900g at 27 weeks to a full-term weight of 2.5–4kg by 40 weeks.\n\n**Key milestones:**\n- **Week 28:** Baby can open their eyes and respond to light\n- **Week 32:** Baby practices breathing movements; lungs maturing\n- **Week 36:** Baby is considered late preterm; most organs are ready\n- **Week 37–40:** Full term — baby could arrive any day!\n\n**Common discomforts and tips:**\n- Back pain: Use a pregnancy pillow, try prenatal massage\n- Heartburn: Eat small meals, avoid spicy food, sleep propped up\n- Swollen ankles: Elevate feet, reduce salt, stay hydrated\n- Braxton Hicks: Practice contractions — irregular, painless; NOT true labour\n\n**Prepare for birth:**\n- Pack your hospital bag by week 36\n- Finalise your birth plan\n- Attend antenatal classes\n- Install the infant car seat`,
+        category: 'fetal_development', type: 'article',
+        trimesterTarget: JSON.stringify([3]),
+        tags: JSON.stringify(['third trimester', 'fetal development', 'birth preparation', 'labour']),
+        readTimeMinutes: 8, isPublished: true, publishedAt: now,
+        viewCount: 287, likeCount: 52, isFeatured: true,
+        createdAt: now, updatedAt: now,
+      },
+      {
+        id: uuidv4(), authorId: PROVIDER1_ID,
+        title: 'Mental Health During Pregnancy: Managing Anxiety and Depression',
+        slug: 'mental-health-pregnancy',
+        summary: 'Perinatal mental health matters. Learn to recognise symptoms and where to get help.',
+        content: `Up to 20% of pregnant women experience anxiety or depression. These are medical conditions — not signs of weakness — and they are treatable.\n\n**Signs of antenatal depression:**\n- Persistent sadness or low mood lasting more than 2 weeks\n- Loss of interest in activities you usually enjoy\n- Feeling worthless or hopeless\n- Sleep disturbances beyond normal pregnancy disruption\n- Difficulty bonding with the baby\n\n**Signs of antenatal anxiety:**\n- Excessive worry you cannot control\n- Physical symptoms: racing heart, shortness of breath, dizziness\n- Avoidance of pregnancy-related information or appointments\n\n**What helps:**\n- Talk therapy (CBT is highly effective)\n- Peer support groups\n- Regular gentle exercise\n- Mindfulness and breathing exercises\n- Medication (some antidepressants are safe in pregnancy — discuss with your provider)\n\n**Please reach out:** Tell your midwife or doctor how you are feeling. You are not alone.`,
+        category: 'mental_health', type: 'article',
+        trimesterTarget: JSON.stringify([1, 2, 3]),
+        tags: JSON.stringify(['mental health', 'anxiety', 'depression', 'wellbeing']),
+        readTimeMinutes: 7, isPublished: true, publishedAt: now,
+        viewCount: 389, likeCount: 73, isFeatured: false,
+        createdAt: now, updatedAt: now,
+      },
+    ]);
+  },
+
+  async down(queryInterface) {
+    await queryInterface.bulkDelete('education_contents', null, {});
+  },
+};
