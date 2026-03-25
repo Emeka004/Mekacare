@@ -68,6 +68,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     checkSession();
+
+    // Subscribe to auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === 'SIGNED_IN' && session) {
+        setAccessToken(session.access_token);
+        await fetchProfile(session.access_token);
+      } else if (event === 'SIGNED_OUT') {
+        setUser(null);
+        setAccessToken(null);
+      } else if (event === 'TOKEN_REFRESHED' && session) {
+        setAccessToken(session.access_token);
+      }
+    });
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   const signIn = async (email: string, password: string) => {
@@ -135,3 +153,4 @@ export function useAuth() {
   }
   return context;
 }
+
