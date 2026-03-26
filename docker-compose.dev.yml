@@ -1,0 +1,42 @@
+version: '3.9'
+
+# Development override – mounts source code for hot reload
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  db:
+    ports:
+      - "5432:5432"    # expose DB directly in dev
+
+  backend:
+    build:
+      context: ./backend
+      target: development
+    command: npm run dev
+    environment:
+      NODE_ENV: development
+    volumes:
+      - ./backend:/home/node/app
+      - /home/node/app/node_modules
+    ports:
+      - "5000:5000"
+      - "9229:9229"    # Node inspector / debugger
+
+  frontend:
+    build:
+      context: ./frontend
+      target: development
+    command: npm run dev
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:5000/api
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    ports:
+      - "3000:3000"
+
+  nginx:
+    profiles:
+      - "production"   # skip nginx in dev
