@@ -67,8 +67,8 @@ unzip pregnancy-health-fullstack.zip
 cd pregnancy-health-fullstack
 
 # OR clone from GitHub (if pushed):
-git clone https://github.com/your-org/pregnancy-health-fullstack.git
-cd pregnancy-health-fullstack
+git clone https://github.com/Emeka004/Mekacare.git
+cd Mekacare
 ```
 
 ---
