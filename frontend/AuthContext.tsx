@@ -1,156 +1,92 @@
-import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { createClient } from '@supabase/supabase-js';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
+'use client';
 
-interface User {
-  id: string;
-  email: string;
-  name: string;
-  userType: 'patient' | 'provider';
-}
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import api from '@/lib/api';
+import type { User, LoginPayload, RegisterPayload, AuthTokens } from '@/types';
 
-interface AuthContextType {
+interface AuthContextValue {
   user: User | null;
-  accessToken: string | null;
-  loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, name: string, userType: 'patient' | 'provider') => Promise<void>;
-  signOut: () => Promise<void>;
-  refreshProfile: () => Promise<void>;
+  isLoading: boolean;
+  isAuthenticated: boolean;
+  login: (payload: LoginPayload) => Promise<void>;
+  register: (payload: RegisterPayload) => Promise<void>;
+  logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 }
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextValue | null>(null);
 
-const supabase = createClient(
-  `https://${projectId}.supabase.co`,
-  publicAnonKey
-);
-
-export function AuthProvider({ children }: { children: ReactNode }) {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
+  const router = useRouter();
 
-  const fetchProfile = async (token: string) => {
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-f10e7e14/profile`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setUser(data.profile);
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    }
+  const saveTokens = (tokens: AuthTokens) => {
+    localStorage.setItem('accessToken', tokens.accessToken);
+    localStorage.setItem('refreshToken', tokens.refreshToken);
   };
 
-  const checkSession = async () => {
-    try {
-      const { data: { session }, error } = await supabase.auth.getSession();
-      
-      if (session?.access_token) {
-        setAccessToken(session.access_token);
-        await fetchProfile(session.access_token);
-      }
-    } catch (error) {
-      console.error('Error checking session:', error);
-    } finally {
-      setLoading(false);
-    }
+  const clearTokens = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
   };
 
-  useEffect(() => {
-    checkSession();
-
-    // Subscribe to auth state changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
-      if (event === 'SIGNED_IN' && session) {
-        setAccessToken(session.access_token);
-        await fetchProfile(session.access_token);
-      } else if (event === 'SIGNED_OUT') {
-        setUser(null);
-        setAccessToken(null);
-      } else if (event === 'TOKEN_REFRESHED' && session) {
-        setAccessToken(session.access_token);
-      }
-    });
-
-    // Cleanup subscription on unmount
-    return () => {
-      subscription.unsubscribe();
-    };
+  const refreshUser = useCallback(async () => {
+    try {
+      const { data } = await api.get('/auth/me');
+      setUser(data.data.user);
+    } catch {
+      clearTokens();
+      setUser(null);
+    }
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      throw error;
+  // Hydrate user from stored token on mount
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      refreshUser().finally(() => setIsLoading(false));
+    } else {
+      setIsLoading(false);
     }
+  }, [refreshUser]);
 
-    if (data.session) {
-      setAccessToken(data.session.access_token);
-      await fetchProfile(data.session.access_token);
-    }
+  const login = async (payload: LoginPayload) => {
+    const { data } = await api.post('/auth/login', payload);
+    const { user: u, accessToken, refreshToken } = data.data;
+    saveTokens({ accessToken, refreshToken });
+    setUser(u);
+    // Role-based redirect
+    if (u.role === 'admin')    router.push('/admin');
+    else if (u.role === 'provider') router.push('/dashboard/provider');
+    else router.push('/dashboard');
   };
 
-  const signUp = async (email: string, password: string, name: string, userType: 'patient' | 'provider') => {
-    const response = await fetch(
-      `https://${projectId}.supabase.co/functions/v1/make-server-f10e7e14/signup`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${publicAnonKey}`,
-        },
-        body: JSON.stringify({ email, password, name, userType }),
-      }
-    );
-
-    const data = await response.json();
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Sign up failed');
-    }
-
-    // Sign in after successful signup
-    await signIn(email, password);
+  const register = async (payload: RegisterPayload) => {
+    const { data } = await api.post('/auth/register', payload);
+    const { user: u, accessToken, refreshToken } = data.data;
+    saveTokens({ accessToken, refreshToken });
+    setUser(u);
+    router.push('/dashboard');
   };
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
+  const logout = async () => {
+    try { await api.post('/auth/logout'); } catch { /* ignore */ }
+    clearTokens();
     setUser(null);
-    setAccessToken(null);
-  };
-
-  const refreshProfile = async () => {
-    if (accessToken) {
-      await fetchProfile(accessToken);
-    }
+    router.push('/auth/login');
   };
 
   return (
-    <AuthContext.Provider value={{ user, accessToken, loading, signIn, signUp, signOut, refreshProfile }}>
+    <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
+  return ctx;
 }
-
