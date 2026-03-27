@@ -1,0 +1,148 @@
+'use client';
+
+import { useAuth } from '@/contexts/AuthContext';
+import { useMyPregnancyProfile, useAppointments, useLatestVital, useNotifications } from '@/hooks';
+import { format } from 'date-fns';
+import { Baby, Calendar, Activity, AlertTriangle, BookOpen, Bell } from 'lucide-react';
+import Link from 'next/link';
+
+function StatCard({ label, value, sub, icon: Icon, color }: {
+  label: string; value: string | number; sub?: string;
+  icon: React.ElementType; color: string;
+}) {
+  return (
+    <div className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-sm text-gray-500">{label}</p>
+          <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+          {sub && <p className="text-xs text-gray-400 mt-0.5">{sub}</p>}
+        </div>
+        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${color}`}>
+          <Icon className="w-5 h-5" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function PatientDashboard() {
+  const { user } = useAuth();
+  const { data: profileData } = useMyPregnancyProfile();
+  const { data: apptData } = useAppointments({ limit: 3, status: 'scheduled' });
+  const { data: latestVital } = useLatestVital();
+  const { unreadCount } = useNotifications();
+
+  const profile = profileData?.profile;
+  const appointments = apptData?.data ?? [];
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">
+          Good morning, {user?.firstName} 👋
+        </h1>
+        <p className="text-gray-500 text-sm mt-1">Here&apos;s your pregnancy health overview</p>
+      </div>
+
+      {/* Stats row */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatCard
+          label="Gestational Age"
+          value={profile?.gestationalAge ? `${profile.gestationalAge}w` : '—'}
+          sub={profile?.trimester ? `Trimester ${profile.trimester}` : undefined}
+          icon={Baby}
+          color="bg-pink-100 text-pink-600"
+        />
+        <StatCard
+          label="Due Date"
+          value={profile?.estimatedDueDate ? format(new Date(profile.estimatedDueDate), 'MMM d, yyyy') : '—'}
+          icon={Calendar}
+          color="bg-purple-100 text-purple-600"
+        />
+        <StatCard
+          label="Last BP"
+          value={latestVital
+            ? `${latestVital.bloodPressureSystolic}/${latestVital.bloodPressureDiastolic}`
+            : '—'}
+          sub={latestVital?.isAbnormal ? '⚠️ Abnormal' : latestVital ? 'Normal' : undefined}
+          icon={Activity}
+          color={latestVital?.isAbnormal ? 'bg-red-100 text-red-600' : 'bg-teal-100 text-teal-600'}
+        />
+        <StatCard
+          label="Notifications"
+          value={unreadCount}
+          sub="unread"
+          icon={Bell}
+          color="bg-amber-100 text-amber-600"
+        />
+      </div>
+
+      {/* High risk banner */}
+      {profile?.isHighRisk && (
+        <div className="flex items-start gap-3 bg-red-50 border border-red-200 text-red-800 rounded-2xl p-4">
+          <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="font-semibold text-sm">High-Risk Pregnancy</p>
+            <p className="text-xs mt-0.5">Your profile is flagged as high-risk. Ensure you attend all scheduled appointments and report any concerning symptoms immediately.</p>
+            <Link href="/risks" className="text-xs font-medium underline mt-1 block">Report a symptom →</Link>
+          </div>
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Upcoming appointments */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-semibold text-gray-900">Upcoming Appointments</h2>
+            <Link href="/appointments" className="text-xs text-pink-500 font-medium hover:text-pink-700">View all</Link>
+          </div>
+          {appointments.length === 0 ? (
+            <p className="text-sm text-gray-400 text-center py-6">No upcoming appointments</p>
+          ) : (
+            <div className="space-y-3">
+              {appointments.map((appt) => (
+                <div key={appt.id} className="flex items-center gap-3 p-3 rounded-xl bg-gray-50">
+                  <div className="w-10 h-10 rounded-xl bg-pink-100 flex items-center justify-center flex-shrink-0">
+                    <Calendar className="w-4 h-4 text-pink-600" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium text-gray-900 capitalize">{appt.type.replace(/_/g, ' ')}</p>
+                    <p className="text-xs text-gray-400">{format(new Date(appt.scheduledAt), 'MMM d, yyyy · h:mm a')}</p>
+                  </div>
+                  <span className={`ml-auto text-xs font-medium px-2 py-1 rounded-full capitalize ${
+                    appt.status === 'confirmed' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
+                  }`}>{appt.status}</span>
+                </div>
+              ))}
+            </div>
+          )}
+          <Link href="/appointments/new"
+            className="mt-4 block w-full text-center py-2 rounded-xl border-2 border-dashed border-gray-200 text-sm text-gray-400 hover:border-pink-300 hover:text-pink-500 transition-colors">
+            + Book appointment
+          </Link>
+        </div>
+
+        {/* Quick links */}
+        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+          <h2 className="font-semibold text-gray-900 mb-4">Quick Actions</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { href: '/vitals/new',   label: 'Log Vitals',      icon: Activity,      color: 'bg-teal-50 text-teal-600' },
+              { href: '/risks/new',    label: 'Report Risk',     icon: AlertTriangle, color: 'bg-red-50 text-red-600' },
+              { href: '/education',    label: 'Learn',           icon: BookOpen,      color: 'bg-purple-50 text-purple-600' },
+              { href: '/providers',   label: 'Find Provider',   icon: Calendar,      color: 'bg-pink-50 text-pink-600' },
+            ].map(({ href, label, icon: Icon, color }) => (
+              <Link key={href} href={href}
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl ${color} hover:opacity-80 transition-opacity`}>
+                <Icon className="w-5 h-5" />
+                <span className="text-xs font-medium">{label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

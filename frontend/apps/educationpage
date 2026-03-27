@@ -1,0 +1,112 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { useAsync } from '@/hooks';
+import { educationService } from '@/services';
+import { BookOpen, Clock, Heart, Search } from 'lucide-react';
+import type { ContentCategory } from '@/types';
+
+const CATEGORIES: { value: ContentCategory | 'all'; label: string }[] = [
+  { value: 'all',              label: 'All' },
+  { value: 'nutrition',        label: '🥗 Nutrition' },
+  { value: 'exercise',         label: '🏃 Exercise' },
+  { value: 'mental_health',    label: '🧠 Mental Health' },
+  { value: 'warning_signs',    label: '⚠️ Warning Signs' },
+  { value: 'fetal_development',label: '👶 Fetal Development' },
+  { value: 'labor_delivery',   label: '🏥 Labour & Delivery' },
+];
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function useAsync<T>(fn: () => Promise<T>, deps: unknown[]) {
+  const { useState, useEffect, useCallback } = require('react');
+  const [data, setData] = useState<T | null>(null);
+  const [isLoading, setLoading] = useState(true);
+  const execute = useCallback(async () => {
+    setLoading(true);
+    try { setData(await fn()); } finally { setLoading(false); }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, deps);
+  useEffect(() => { execute(); }, [execute]);
+  return { data, isLoading };
+}
+
+export default function EducationPage() {
+  const [category, setCategory] = useState<ContentCategory | 'all'>('all');
+  const [search, setSearch] = useState('');
+
+  const { data, isLoading } = useAsync(
+    () => educationService.getAll({ category: category === 'all' ? undefined : category, search: search || undefined }),
+    [category, search]
+  );
+  const articles = data?.data ?? [];
+
+  return (
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-2xl font-bold text-gray-900">Education Library</h1>
+        <p className="text-gray-500 text-sm mt-1">Curated pregnancy health resources, personalised for your trimester</p>
+      </div>
+
+      {/* Search */}
+      <div className="relative">
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+        <input
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="Search articles…"
+          className="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 bg-white"
+        />
+      </div>
+
+      {/* Category chips */}
+      <div className="flex gap-2 flex-wrap">
+        {CATEGORIES.map(({ value, label }) => (
+          <button key={value} onClick={() => setCategory(value)}
+            className={`px-3 py-1.5 rounded-full text-xs font-medium border transition-colors ${
+              category === value
+                ? 'bg-pink-500 text-white border-pink-500'
+                : 'border-gray-200 text-gray-600 hover:border-pink-300 bg-white'
+            }`}>
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Grid */}
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {[1,2,3,4,5,6].map(n => <div key={n} className="h-56 bg-gray-100 rounded-2xl animate-pulse" />)}
+        </div>
+      ) : articles.length === 0 ? (
+        <div className="text-center py-20 text-gray-400">
+          <BookOpen className="w-12 h-12 mx-auto mb-3 opacity-30" />
+          <p>No articles found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {articles.map((article) => (
+            <Link key={article.id} href={`/education/${article.slug}`}
+              className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+              {article.isFeatured && (
+                <span className="self-start text-xs bg-pink-100 text-pink-600 font-medium px-2 py-0.5 rounded-full mb-3">Featured</span>
+              )}
+              <p className="text-xs text-gray-400 capitalize mb-1">{article.category.replace(/_/g, ' ')}</p>
+              <h3 className="font-semibold text-gray-900 text-sm leading-snug line-clamp-2 flex-1">{article.title}</h3>
+              {article.summary && <p className="text-xs text-gray-400 mt-2 line-clamp-2">{article.summary}</p>}
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-gray-50 text-xs text-gray-400">
+                <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> {article.readTimeMinutes ?? '—'} min</span>
+                <span className="flex items-center gap-1"><Heart className="w-3 h-3" /> {article.likeCount}</span>
+                <span className="flex gap-1">
+                  {article.trimesterTarget.map(t => (
+                    <span key={t} className="bg-purple-50 text-purple-600 px-1.5 py-0.5 rounded-full">T{t}</span>
+                  ))}
+                </span>
+              </div>
+            </Link>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
