@@ -21,8 +21,11 @@ app.use(helmet());
 // ── CORS ──────────────────────────────────────────────────────────────
 app.use(cors({
   origin: (origin, cb) => {
-    const allowed = (process.env.CLIENT_URL || 'http://localhost:3000').split(',');
-    if (!origin || allowed.includes(origin)) return cb(null, true);
+    if (!origin) return cb(null, true);
+    const allowed = (process.env.CLIENT_URL || 'http://localhost:3000').split(',').map(u => u.trim());
+    const isAllowed = allowed.some(u => origin === u) ||
+      /^https:\/\/mekacare(-[a-z0-9]+)*\.vercel\.app$/.test(origin);
+    if (isAllowed) return cb(null, true);
     cb(new Error(`CORS blocked: ${origin}`));
   },
   credentials: true,
