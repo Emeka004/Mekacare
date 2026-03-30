@@ -13,11 +13,8 @@ const start = async () => {
     await sequelize.authenticate();
     logger.info('✅  Database connection established');
 
-    if (process.env.NODE_ENV === 'development') {
-      // Sync only in development; use migrations in staging/production
-      await sequelize.sync({ alter: false });
-      logger.info('✅  Sequelize models synced');
-    }
+    await sequelize.sync({ alter: true });
+    logger.info('✅  Sequelize models synced');
 
     app.listen(PORT, () => {
       logger.info(`🚀  Server running on port ${PORT} [${process.env.NODE_ENV}]`);
