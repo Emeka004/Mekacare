@@ -24,10 +24,10 @@ export default function ProviderDashboardPage() {
       ) : (
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[
-            { label: 'Total Patients',       value: data?.summary?.totalPatients ?? 0,    icon: Users,          color: 'bg-pink-100 text-pink-600' },
-            { label: "Today's Appointments", value: data?.summary?.todayAppointments ?? 0, icon: Calendar,       color: 'bg-blue-100 text-blue-600' },
-            { label: 'Pending Risks',        value: data?.summary?.pendingRisks ?? 0,      icon: AlertTriangle,  color: 'bg-orange-100 text-orange-600' },
-            { label: 'Abnormal Vitals',      value: data?.summary?.abnormalVitals ?? 0,    icon: Activity,       color: 'bg-red-100 text-red-600' },
+            { label: 'Total Patients',       value: data?.stats?.totalPatients ?? 0,      icon: Users,          color: 'bg-pink-100 text-pink-600' },
+            { label: "Today's Appointments", value: data?.stats?.todayAppointments ?? 0,   icon: Calendar,       color: 'bg-blue-100 text-blue-600' },
+            { label: 'Pending Reports',      value: data?.stats?.pendingReports ?? 0,      icon: AlertTriangle,  color: 'bg-orange-100 text-orange-600' },
+            { label: 'High Risk Patients',   value: data?.stats?.highRiskPatients ?? 0,    icon: Activity,       color: 'bg-red-100 text-red-600' },
           ].map(({ label, value, icon: Icon, color }) => (
             <div key={label} className="bg-white rounded-2xl p-5 border border-gray-100 shadow-sm">
               <div className="flex items-start justify-between">
