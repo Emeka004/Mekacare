@@ -1,40 +1,21 @@
 'use strict';
 
-const logger = require('../utils/logger');
-const { error } = require('../utils/apiResponse');
+const rateLimit = require('express-rate-limit');
 
-// eslint-disable-next-line no-unused-vars
-const errorHandler = (err, req, res, next) => {
-  logger.error(`${err.name}: ${err.message}\n${err.stack}`);
+const generalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many requests, please try again later.' },
+});
 
-  // Sequelize validation error
-  if (err.name === 'SequelizeValidationError' || err.name === 'SequelizeUniqueConstraintError') {
-    const messages = err.errors.map((e) => ({ field: e.path, message: e.message }));
-    return error(res, 'Validation error', 422, messages);
-  }
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { success: false, message: 'Too many authentication attempts, please try again later.' },
+});
 
-  // Sequelize FK constraint
-  if (err.name === 'SequelizeForeignKeyConstraintError') {
-    return error(res, 'Referenced resource does not exist', 400);
-  }
-
-  // JWT errors that slipped through
-  if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
-    return error(res, 'Invalid or expired token', 401);
-  }
-
-  // Multer / file too large
-  if (err.code === 'LIMIT_FILE_SIZE') {
-    return error(res, 'File too large', 413);
-  }
-
-  // Default 500
-  const statusCode = err.statusCode || err.status || 500;
-  const message = process.env.NODE_ENV === 'production' && statusCode === 500
-    ? 'An unexpected error occurred'
-    : err.message || 'Internal server error';
-
-  return error(res, message, statusCode);
-};
-
-module.exports = errorHandler;
+module.exports = { generalLimiter, authLimiter };
