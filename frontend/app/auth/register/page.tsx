@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
 import Link from 'next/link';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import type { RegisterPayload } from '@/types';
 import { Baby } from 'lucide-react';
 
 const schema = z.object({
@@ -28,7 +28,7 @@ export default function RegisterPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await authRegister(data);
+      await authRegister(data as unknown as RegisterPayload);
       toast.success('Account created! Welcome to PregnancyCare.');
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Registration failed');

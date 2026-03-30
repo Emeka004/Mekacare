@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import type { LoginPayload } from '@/types';
 import { Eye, EyeOff, Baby } from 'lucide-react';
 
 const schema = z.object({
@@ -22,7 +23,7 @@ export default function LoginPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await login(data);
+      await login(data as unknown as LoginPayload);
       toast.success('Welcome back!');
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Invalid email or password';

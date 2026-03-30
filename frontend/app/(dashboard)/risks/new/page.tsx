@@ -37,7 +37,13 @@ export default function NewRiskPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await riskService.create(data);
+      await riskService.create({
+        title:             data.title!,
+        category:          data.category!,
+        severity:          data.severity!,
+        description:       data.description!,
+        requiresEmergency: data.requiresEmergency,
+      });
       toast.success('Risk report submitted. A provider will review it shortly.');
       router.push('/risks');
     } catch {

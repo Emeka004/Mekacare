@@ -44,7 +44,15 @@ export default function NewAppointmentPage() {
 
   const onSubmit = async (data: FormData) => {
     try {
-      await appointmentService.create(data);
+      await appointmentService.create({
+        providerId:  data.providerId!,
+        scheduledAt: data.scheduledAt!,
+        type:        data.type!,
+        duration:    data.duration,
+        reason:      data.reason,
+        isVirtual:   data.isVirtual,
+        location:    data.location,
+      });
       toast.success('Appointment booked!');
       router.push('/appointments');
     } catch {
