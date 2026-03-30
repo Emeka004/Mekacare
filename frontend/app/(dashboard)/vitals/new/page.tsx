@@ -75,7 +75,7 @@ export default function NewVitalsPage() {
               <div key={name}>
                 <label htmlFor={name} className="block text-xs font-medium text-gray-600 mb-1">{label}</label>
                 <div className="relative">
-                  <input {...register(name)} id={name} type="number" step={step} placeholder="—"
+                  <input {...register(name)} id={name} type="number" step={step} autoComplete="off" placeholder="—"
                     className="w-full px-3 py-2 pr-12 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
                   <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-gray-400">{unit}</span>
                 </div>

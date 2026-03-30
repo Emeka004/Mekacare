@@ -53,7 +53,7 @@ export default function RegisterPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             <div>
-              <label className={labelClass}>I am a</label>
+              <p className={labelClass}>I am a</p>
               <div className="grid grid-cols-2 gap-2">
                 {(['patient', 'provider'] as const).map(role => (
                   <label key={role} className="cursor-pointer">
@@ -69,30 +69,30 @@ export default function RegisterPage() {
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <label htmlFor="firstName" className={labelClass}>First name</label>
-                <input {...register('firstName')} id="firstName" placeholder="Chioma" className={inputClass} />
+                <input {...register('firstName')} id="firstName" autoComplete="given-name" placeholder="Chioma" className={inputClass} />
                 {errors.firstName && <p className={errorClass}>{errors.firstName.message}</p>}
               </div>
               <div>
                 <label htmlFor="lastName" className={labelClass}>Last name</label>
-                <input {...register('lastName')} id="lastName" placeholder="Osei" className={inputClass} />
+                <input {...register('lastName')} id="lastName" autoComplete="family-name" placeholder="Osei" className={inputClass} />
                 {errors.lastName && <p className={errorClass}>{errors.lastName.message}</p>}
               </div>
             </div>
 
             <div>
               <label htmlFor="reg-email" className={labelClass}>Email address</label>
-              <input {...register('email')} id="reg-email" type="email" placeholder="you@example.com" className={inputClass} />
+              <input {...register('email')} id="reg-email" type="email" autoComplete="email" placeholder="you@example.com" className={inputClass} />
               {errors.email && <p className={errorClass}>{errors.email.message}</p>}
             </div>
 
             <div>
               <label htmlFor="phone" className={labelClass}>Phone (optional)</label>
-              <input {...register('phone')} id="phone" type="tel" placeholder="+234 800 000 0000" className={inputClass} />
+              <input {...register('phone')} id="phone" type="tel" autoComplete="tel" placeholder="+234 800 000 0000" className={inputClass} />
             </div>
 
             <div>
               <label htmlFor="reg-password" className={labelClass}>Password</label>
-              <input {...register('password')} id="reg-password" type="password" placeholder="Min. 8 characters" className={inputClass} />
+              <input {...register('password')} id="reg-password" type="password" autoComplete="new-password" placeholder="Min. 8 characters" className={inputClass} />
               {errors.password && <p className={errorClass}>{errors.password.message}</p>}
             </div>
 
