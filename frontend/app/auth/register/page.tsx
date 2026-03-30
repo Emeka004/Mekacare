@@ -68,31 +68,31 @@ export default function RegisterPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <label className={labelClass}>First name</label>
-                <input {...register('firstName')} placeholder="Chioma" className={inputClass} />
+                <label htmlFor="firstName" className={labelClass}>First name</label>
+                <input {...register('firstName')} id="firstName" placeholder="Chioma" className={inputClass} />
                 {errors.firstName && <p className={errorClass}>{errors.firstName.message}</p>}
               </div>
               <div>
-                <label className={labelClass}>Last name</label>
-                <input {...register('lastName')} placeholder="Osei" className={inputClass} />
+                <label htmlFor="lastName" className={labelClass}>Last name</label>
+                <input {...register('lastName')} id="lastName" placeholder="Osei" className={inputClass} />
                 {errors.lastName && <p className={errorClass}>{errors.lastName.message}</p>}
               </div>
             </div>
 
             <div>
-              <label className={labelClass}>Email address</label>
-              <input {...register('email')} type="email" placeholder="you@example.com" className={inputClass} />
+              <label htmlFor="reg-email" className={labelClass}>Email address</label>
+              <input {...register('email')} id="reg-email" type="email" placeholder="you@example.com" className={inputClass} />
               {errors.email && <p className={errorClass}>{errors.email.message}</p>}
             </div>
 
             <div>
-              <label className={labelClass}>Phone (optional)</label>
-              <input {...register('phone')} type="tel" placeholder="+234 800 000 0000" className={inputClass} />
+              <label htmlFor="phone" className={labelClass}>Phone (optional)</label>
+              <input {...register('phone')} id="phone" type="tel" placeholder="+234 800 000 0000" className={inputClass} />
             </div>
 
             <div>
-              <label className={labelClass}>Password</label>
-              <input {...register('password')} type="password" placeholder="Min. 8 characters" className={inputClass} />
+              <label htmlFor="reg-password" className={labelClass}>Password</label>
+              <input {...register('password')} id="reg-password" type="password" placeholder="Min. 8 characters" className={inputClass} />
               {errors.password && <p className={errorClass}>{errors.password.message}</p>}
             </div>
 

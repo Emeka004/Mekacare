@@ -76,8 +76,8 @@ export default function NewAppointmentPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Provider</label>
-            <select {...register('providerId')}
+            <label htmlFor="providerId" className="block text-sm font-medium text-gray-700 mb-1.5">Provider</label>
+            <select {...register('providerId')} id="providerId"
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400">
               <option value="">Select a provider</option>
               {providers.map(p => (
@@ -90,8 +90,8 @@ export default function NewAppointmentPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
-            <select {...register('type')}
+            <label htmlFor="appt-type" className="block text-sm font-medium text-gray-700 mb-1.5">Type</label>
+            <select {...register('type')} id="appt-type"
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400">
               {APPOINTMENT_TYPES.map(t => (
                 <option key={t} value={t}>{t.replace(/_/g, ' ')}</option>
@@ -100,27 +100,27 @@ export default function NewAppointmentPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Date &amp; Time</label>
-            <input {...register('scheduledAt')} type="datetime-local"
+            <label htmlFor="scheduledAt" className="block text-sm font-medium text-gray-700 mb-1.5">Date &amp; Time</label>
+            <input {...register('scheduledAt')} id="scheduledAt" type="datetime-local"
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
             {errors.scheduledAt && <p className="mt-1 text-xs text-red-500">{errors.scheduledAt.message}</p>}
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Duration (minutes)</label>
-            <input {...register('duration')} type="number" min={15} max={180} step={15}
+            <label htmlFor="duration" className="block text-sm font-medium text-gray-700 mb-1.5">Duration (minutes)</label>
+            <input {...register('duration')} id="duration" type="number" min={15} max={180} step={15}
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Location (optional)</label>
-            <input {...register('location')} type="text" placeholder="Clinic address or meeting link"
+            <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-1.5">Location (optional)</label>
+            <input {...register('location')} id="location" type="text" placeholder="Clinic address or meeting link"
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Reason (optional)</label>
-            <textarea {...register('reason')} rows={3} placeholder="Briefly describe the reason for this visit"
+            <label htmlFor="reason" className="block text-sm font-medium text-gray-700 mb-1.5">Reason (optional)</label>
+            <textarea {...register('reason')} id="reason" rows={3} placeholder="Briefly describe the reason for this visit"
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 resize-none" />
           </div>
 

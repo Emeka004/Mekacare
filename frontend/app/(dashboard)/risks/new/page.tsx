@@ -72,23 +72,23 @@ export default function NewRiskPage() {
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Title</label>
-            <input {...register('title')} type="text" placeholder="Brief description of your concern"
+            <label htmlFor="risk-title" className="block text-sm font-medium text-gray-700 mb-1.5">Title</label>
+            <input {...register('title')} id="risk-title" type="text" placeholder="Brief description of your concern"
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
             {errors.title && <p className="mt-1 text-xs text-red-500">{errors.title.message}</p>}
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
-              <select {...register('category')}
+              <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1.5">Category</label>
+              <select {...register('category')} id="category"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400">
                 {CATEGORIES.map(c => <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Severity</label>
-              <select {...register('severity')}
+              <label htmlFor="severity" className="block text-sm font-medium text-gray-700 mb-1.5">Severity</label>
+              <select {...register('severity')} id="severity"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400">
                 {SEVERITIES.map(s => (
                   <option key={s} value={s} className={SEVERITY_COLORS[s]}>{s}</option>
@@ -98,8 +98,8 @@ export default function NewRiskPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
-            <textarea {...register('description')} rows={5}
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1.5">Description</label>
+            <textarea {...register('description')} id="description" rows={5}
               placeholder="Describe your symptoms, when they started, and any other relevant details"
               className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 resize-none" />
             {errors.description && <p className="mt-1 text-xs text-red-500">{errors.description.message}</p>}

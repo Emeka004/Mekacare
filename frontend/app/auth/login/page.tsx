@@ -45,9 +45,10 @@ export default function LoginPage() {
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1.5">Email address</label>
               <input
                 {...register('email')}
+                id="email"
                 type="email"
                 autoComplete="email"
                 placeholder="you@example.com"
@@ -58,12 +59,13 @@ export default function LoginPage() {
 
             <div>
               <div className="flex justify-between items-center mb-1.5">
-                <label className="block text-sm font-medium text-gray-700">Password</label>
+                <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
                 <Link href="/auth/forgot-password" className="text-xs text-pink-500 hover:text-pink-700">Forgot password?</Link>
               </div>
               <div className="relative">
                 <input
                   {...register('password')}
+                  id="password"
                   type={showPw ? 'text' : 'password'}
                   autoComplete="current-password"
                   className="w-full px-4 py-2.5 pr-10 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 focus:border-transparent"

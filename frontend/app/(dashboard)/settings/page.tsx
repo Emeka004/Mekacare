@@ -80,16 +80,16 @@ export default function SettingsPage() {
           <form onSubmit={profileForm.handleSubmit(saveProfile)} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">First name</label>
-                <input {...profileForm.register('firstName')}
+                <label htmlFor="s-firstName" className="block text-sm font-medium text-gray-700 mb-1.5">First name</label>
+                <input {...profileForm.register('firstName')} id="s-firstName"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
                 {profileForm.formState.errors.firstName && (
                   <p className="mt-1 text-xs text-red-500">{profileForm.formState.errors.firstName.message}</p>
                 )}
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">Last name</label>
-                <input {...profileForm.register('lastName')}
+                <label htmlFor="s-lastName" className="block text-sm font-medium text-gray-700 mb-1.5">Last name</label>
+                <input {...profileForm.register('lastName')} id="s-lastName"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
                 {profileForm.formState.errors.lastName && (
                   <p className="mt-1 text-xs text-red-500">{profileForm.formState.errors.lastName.message}</p>
@@ -97,13 +97,13 @@ export default function SettingsPage() {
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Phone (optional)</label>
-              <input {...profileForm.register('phone')} type="tel"
+              <label htmlFor="s-phone" className="block text-sm font-medium text-gray-700 mb-1.5">Phone (optional)</label>
+              <input {...profileForm.register('phone')} id="s-phone" type="tel"
                 className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
-              <input value={user?.email ?? ''} disabled
+              <label htmlFor="s-email" className="block text-sm font-medium text-gray-700 mb-1.5">Email</label>
+              <input id="s-email" value={user?.email ?? ''} disabled
                 className="w-full px-4 py-2.5 border border-gray-100 rounded-xl text-sm bg-gray-50 text-gray-400" />
             </div>
             <button type="submit" disabled={profileForm.formState.isSubmitting}
@@ -123,10 +123,10 @@ export default function SettingsPage() {
           <form onSubmit={passwordForm.handleSubmit(savePassword)} className="space-y-4">
             {(['currentPassword', 'newPassword', 'confirm'] as const).map((field) => (
               <div key={field}>
-                <label className="block text-sm font-medium text-gray-700 mb-1.5">
+                <label htmlFor={field} className="block text-sm font-medium text-gray-700 mb-1.5">
                   {field === 'currentPassword' ? 'Current password' : field === 'newPassword' ? 'New password' : 'Confirm new password'}
                 </label>
-                <input {...passwordForm.register(field)} type="password"
+                <input {...passwordForm.register(field)} id={field} type="password"
                   className="w-full px-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-pink-400" />
                 {passwordForm.formState.errors[field] && (
                   <p className="mt-1 text-xs text-red-500">{passwordForm.formState.errors[field]?.message}</p>
