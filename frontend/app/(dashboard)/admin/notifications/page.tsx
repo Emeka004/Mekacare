@@ -24,8 +24,10 @@ export default function AdminNotificationsPage() {
   const onSubmit = async (data: FormData) => {
     try {
       await notificationService.broadcast({
-        ...data,
+        title: data.title,
+        message: data.message,
         type: 'broadcast',
+        priority: data.priority,
         roleTarget: data.roleTarget !== 'all' ? data.roleTarget : undefined,
       });
       toast.success('Broadcast sent successfully!');
